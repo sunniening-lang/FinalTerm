@@ -201,6 +201,64 @@ select{
   padding: 0 18px 18px;
   color:var(--muted);
 }
+/* ===== 按鈕顏色重新設計 ===== */
+
+/* 共用按鈕 */
+.btn{
+  padding:10px 14px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.15);
+  font-weight:700;
+  cursor:pointer;
+  color:#fff;
+  box-shadow: 0 8px 20px rgba(0,0,0,.25);
+  transition: all .15s ease;
+}
+
+.btn:hover{
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+.btn:active{
+  transform: translateY(0);
+  filter: brightness(.95);
+}
+
+/* 🟦 新局（主按鈕） */
+#newBtn{
+  background: linear-gradient(180deg, #6fa8ff, #3f6edc);
+  border-color:#7aa2ff;
+}
+
+/* ⏸ PASS / 終局 / 一般功能 */
+.btn--ghost,
+#passBtn,
+#scoreBtn{
+  background: linear-gradient(180deg, #3a456b, #2a3354);
+  border-color:#3f4b75;
+  color:#e9efff;
+}
+
+/* 🟥 投降（危險操作） */
+#resignBtn{
+  background: linear-gradient(180deg, #ff6b6b, #c0392b);
+  border-color:#ff8a8a;
+}
+
+/* 🤖 AI 開關 - 開 */
+#aiToggleBtn{
+  background: linear-gradient(180deg, #5fd3a6, #2fa37a);
+  border-color:#6ee7b7;
+  color:#062c1f;
+}
+
+/* 🤖 AI 開關 - 關（JS 會加 class） */
+#aiToggleBtn.off{
+  background: linear-gradient(180deg, #6b7280, #4b5563);
+  border-color:#9ca3af;
+  color:#f3f4f6;
+}
+
 @media (max-width: 980px){
   .layout{ grid-template-columns: 1fr; }
 }
