@@ -859,6 +859,7 @@ scoreBtn.addEventListener("click", ()=>{
 aiToggleBtn.addEventListener("click", ()=>{
   aiEnabled = !aiEnabled;
   aiToggleBtn.textContent = `AI 開關：${aiEnabled ? "開" : "關"}`;
+   aiToggleBtn.classList.toggle("off", !aiEnabled);
 
   // 若現在剛好輪到白且 AI 開啟 → 立刻 AI
   if(aiEnabled && turn === WHITE && !scoringMode && !gameOver){
