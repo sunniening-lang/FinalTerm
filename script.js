@@ -661,22 +661,19 @@ function computeAndRenderScoreIfNeeded(){
 
 // ========== AI（簡易版：優先提子/避免自殺/隨機） ==========
 function aiMove(){
-  if(gameOver) return;
-  if(!aiEnabled) return;
-  if(scoringMode) return;
-  if(turn !== WHITE) return;
+  if(gameOver || !aiEnabled || scoringMode || turn !== WHITE) return;
 
-  // 收集合法點 + 評分
   const moves = [];
+
   for(let y=0;y<N;y++){
     for(let x=0;x<N;x++){
       if(board[y][x] !== EMPTY) continue;
       if(!isLegalMove(WHITE,x,y,board)) continue;
 
-      // 評分：先看能不能提子
       const sim = cloneBoard(board);
       sim[y][x] = WHITE;
 
+      // 1️⃣ 吃子數
       let captured = 0;
       for(const [nx,ny] of neighbors(x,y)){
         if(sim[ny][nx] === BLACK){
@@ -688,26 +685,60 @@ function aiMove(){
         }
       }
 
-      // 避免自己剛下就變叫吃（只剩 1 氣）
-      const my = getGroup(sim, x, y);
-      const risky = (my.libs.size === 1) ? 1 : 0;
+      // 2️⃣ 自己下完後的氣
+      const myGroup = getGroup(sim, x, y);
+      const myLibs = myGroup.libs.size;
 
-      const score = captured*100 - risky*8 + Math.random(); // 捕獲最優先
-      moves.push({ x,y, score, captured });
+      // 🚨 若只剩 1 氣，非常危險（容易被瞬間翻盤）
+      if(myLibs <= 1) continue;
+
+      // 3️⃣ 檢查：對手是否能立刻反吃我（模擬一手）
+      let suicidal = false;
+      for(let ty=0;ty<N;ty++){
+        for(let tx=0;tx<N;tx++){
+          if(sim[ty][tx] !== EMPTY) continue;
+          if(!isLegalMove(BLACK,tx,ty,sim)) continue;
+
+          const sim2 = cloneBoard(sim);
+          sim2[ty][tx] = BLACK;
+
+          const g2 = getGroup(sim2, x, y);
+          if(g2.libs.size === 0){
+            suicidal = true;
+            break;
+          }
+        }
+        if(suicidal) break;
+      }
+      if(suicidal) continue; // ❌ 會被瞬間反殺，直接丟掉
+
+      // 4️⃣ 中央加分（9 路很重要）
+      const center = (N-1)/2;
+      const distCenter = Math.abs(x-center) + Math.abs(y-center);
+      const centerScore = (N*2 - distCenter);
+
+      // ⭐ 總分
+      const score =
+        captured * 100 +      // 吃子最重要
+        myLibs * 4 +           // 氣多比較安全
+        centerScore * 2 +      // 佔中央
+        Math.random();         // 打破平手
+
+      moves.push({ x, y, score });
     }
   }
 
   if(moves.length === 0){
-    // 沒得下就 PASS
     doPass();
     return;
   }
 
   moves.sort((a,b)=>b.score-a.score);
-  const pick = moves[0];
+  const best = moves[0];
 
-  placeStone(WHITE, pick.x, pick.y);
+  placeStone(WHITE, best.x, best.y);
 }
+
 
 // ========== 讓子（簡化：開局直接放黑子） ==========
 function handicapPoints(n, k){
@@ -859,7 +890,7 @@ scoreBtn.addEventListener("click", ()=>{
 aiToggleBtn.addEventListener("click", ()=>{
   aiEnabled = !aiEnabled;
   aiToggleBtn.textContent = `AI 開關：${aiEnabled ? "開" : "關"}`;
-   aiToggleBtn.classList.toggle("off", !aiEnabled);
+  aiToggleBtn.classList.toggle("off", !aiEnabled);
 
   // 若現在剛好輪到白且 AI 開啟 → 立刻 AI
   if(aiEnabled && turn === WHITE && !scoringMode && !gameOver){
