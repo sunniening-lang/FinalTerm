@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>1132914 -FinalTerm</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand__title">九路圍棋</div>
+      <div class="brand__sub">黑：User（先手）｜白：Computer（後手）</div>
+    </div>
+
+    <div class="controls">
+      <label class="field">
+        棋盤
+        <select id="sizeSelect">
+        <option value="9" selected>9 路</option>
+        <option value="13">13 路</option>
+        <option value="19">19 路</option>
+          </select>
+      </label>
+
+      <label class="field">
+        讓子
+        <select id="handicapSelect">
+          <option value="0" selected>0</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+        </select>
+      </label>
+
+      <button id="aiToggleBtn" class="btn btn--ghost">AI 開關：開</button>
+      <button id="newBtn" class="btn">新局</button>
+      <button id="passBtn" class="btn btn--ghost">PASS</button>
+      <button id="resignBtn" class="btn btn--ghost">投降</button>
+      <button id="scoreBtn" class="btn btn--ghost">進入/重算終局決算</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="boardWrap">
+      <canvas id="board" width="760" height="760"></canvas>
+
+      <div class="hint">
+        <div>落子：點交叉點</div>
+        <div>終局：雙方連續 PASS 兩次</div>
+        <div>終局標死棋：進入終局後，點棋子可切換該整群死/活</div>
+        <div>禁著點：會用紅色 X 顯示（自殺/ko）</div>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div class="card">
+        <div class="card__title">狀態</div>
+        <div id="status" class="mono">準備開始…</div>
+      </div>
+
+      <div class="card">
+        <div class="card__title">提子（Captured）</div>
+        <div class="row">
+          <div class="pill pill--black">黑提白：<span id="capB">0</span></div>
+          <div class="pill pill--white">白提黑：<span id="capW">0</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__title">終局決算</div>
+        <div class="scoreGrid">
+          <div class="scoreItem">
+            <div class="scoreLabel">黑：領地</div>
+            <div id="terrB" class="scoreVal">-</div>
+          </div>
+          <div class="scoreItem">
+            <div class="scoreLabel">白：領地</div>
+            <div id="terrW" class="scoreVal">-</div>
+          </div>
+          <div class="scoreItem">
+            <div class="scoreLabel">黑：總分（領地+提子+死棋）</div>
+            <div id="scoreB" class="scoreVal">-</div>
+          </div>
+          <div class="scoreItem">
+            <div class="scoreLabel">白：總分（含 komi 6.5）</div>
+            <div id="scoreW" class="scoreVal">-</div>
+          </div>
+        </div>
+
+        <div class="smallNote">
+          終局：可點整群標死棋（活棋判斷由你標記），畫面會著色顯示領地範圍。
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__title">規則檢查（基本）</div>
+        <ul class="ul">
+          <li>禁自殺（無氣且未提子）</li>
+          <li>簡單劫（ko：禁止回到兩手前盤面）</li>
+          <li>雙 PASS 進入終局</li>
+          <li>叫吃（Atari）警告：落子後若對方有群剩 1 口氣會提示</li>
+        </ul>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <span class="mono">Tip：AI 關閉時可當作雙人對弈（輪到白也可手動下）。</span>
+  </footer>
+
+  <script src="./script.js"></script>
+</body>
+</html>
